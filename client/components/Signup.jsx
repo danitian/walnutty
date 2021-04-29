@@ -43,6 +43,7 @@ const Signup = () => {
   const handleLoginSubmit = (e) => {
     if (!username || !password || !fullname) {
       setError(true);
+      return;
     } else {
       setError(false);
       setUserCreated(true);

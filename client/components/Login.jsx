@@ -54,8 +54,17 @@ const ErrorMsg = styled.div`
   font-size: 0.8em;
   text-align: center;
 `
+const HelpText = styled.div`
+  cursor: pointer;
+  margin-top: 20px;
+  font-size: 0.8em;
+  text-align: center;
+  &:hover {
+    color: #f5a742;
+  }
+`
 
-const Login = () => {
+const Login = ({ handleSwitchClick }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [authError, setAuthError] = useState(false);
@@ -134,6 +143,9 @@ const Login = () => {
                 type="button"
                 onClick={handleLoginSubmit}>Login</Button>
           </div>
+          <HelpText onClick={handleSwitchClick}>
+            Don't have an account? Sign Up Here
+          </HelpText>
         </div>
       ) : (
         <div>
@@ -150,6 +162,7 @@ const Login = () => {
           Username or password is incorrect!
         </ErrorMsg>
       )}
+
     </div>
   )
 }

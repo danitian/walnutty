@@ -51,8 +51,8 @@ const App = () => {
       <FormWrapper>
         {isLogin && (
           <>
-            <Login />
-            <HelpText onClick={handleSwitchClick}>Don't have an account? Sign Up Here</HelpText>
+            <Login handleSwitchClick={handleSwitchClick} />
+            {/* <HelpText onClick={handleSwitchClick}>Don't have an account? Sign Up Here</HelpText> */}
           </>
         )}
         {isSignup && (
