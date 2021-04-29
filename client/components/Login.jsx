@@ -1,9 +1,78 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import styled from 'styled-components';
+
+const Title = styled.h4`
+  display: flex;
+  justify-content: center;
+  font-size: 2em;
+  font-weight: lighter;
+  margin-top: 0.25em;
+  color: #222;
+`
+const Label = styled.label`
+  margin-bottom: 0.5em;
+  color: #444;
+  font-weight: lighter;
+`
+const Input = styled.input`
+  width: 90%;
+  padding: 10px 10px;
+  border-radius: 5px;
+  outline: none;
+  border: 1px solid #d6d1d5;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+  margin-top: 15px;
+`
+const Button = styled.button`
+  width: 98%;
+  padding: 10px 10px;
+  margin-top: 40px;
+  border-radius: 5px;
+  justify-content: center;
+  display: flex;
+  flex-wrap: wrap;
+  background-color: #4A4E69;
+  color: white;
+  cursor: pointer;
+  &:hover{
+    background-color: #f5a742;
+    color: white;
+    border-color: #4A4E69;
+  }
+`
+const Welcome = styled.div`
+  margin-top: 20px;
+  font-size: 2em;
+  text-align: center;
+`
+const ErrorMsg = styled.div`
+  margin-top: 10px;
+  color: red;
+  font-size: 0.8em;
+  text-align: center;
+`
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [authError, setAuthError] = useState(false);
+  const [authenticated, setAuthenticated] = useState(false);
+
+  const checkAuth = () => {
+    axios.get('/api/checkauth')
+      .then(({ data }) => {
+        if (data.authStatus === 'Authenticated') {
+          setAuthenticated(true);
+          setUsername(data.user.username)
+        }
+      })
+      .catch((err) => console.log(err))
+  }
+
+  useEffect(checkAuth, []);
 
   const handleChange = (e) => {
     if (e.target.name === 'username') {
@@ -14,52 +83,82 @@ const Login = () => {
   }
 
   const handleLoginSubmit = (e) => {
-    console.log('login submitted!')
-
     axios.post('/api/login', { username, password })
       .then(({ data }) => {
-        console.log('login data: ', data);
         if (data === "Authenticated") {
-          console.log('Authenticated, welcome');
+          setAuthenticated(true);
+          setAuthError(false);
         } else {
-          console.log('Auth failed');
+          setAuthError(true);
         }
+        setPassword('');
       })
       .catch((err) => console.log(err));
   }
 
+  const handleLogout = (e) => {
+    axios.get('/api/logout')
+      .then(() => setAuthenticated(false))
+      .catch((err) => console.log(err))
+  }
+
   return (
     <div>
-      <div>
-        LOGIN
-      </div>
-      <div>
+      {!authenticated ? (
         <div>
-          <label>
-            Username:
-            <input
-              type="text"
-              name="username"
-              value={username}
-              onChange={handleChange} />
-          </label>
+          <Title>
+            LOGIN
+          </Title>
+          <div>
+            <div>
+              <Label>
+                Username:
+                <Input
+                  type="text"
+                  name="username"
+                  value={username}
+                  onChange={handleChange} />
+              </Label>
+            </div>
+            <div>
+              <Label>
+                Password:
+                <Input
+                  type="password"
+                  name="password"
+                  value={password}
+                  onChange={handleChange} />
+              </Label>
+            </div>
+            <Button
+                type="button"
+                onClick={handleLoginSubmit}>Login</Button>
+          </div>
         </div>
+      ) : (
         <div>
-          <label>
-            Password:
-            <input
-              type="password"
-              name="password"
-              value={password}
-              onChange={handleChange} />
-          </label>
-          <button
-            type="button"
-            onClick={handleLoginSubmit}>Login</button>
+          <Welcome>
+            Welcome {username}!
+          </Welcome>
+          <Button onClick={handleLogout}>
+            Logout
+          </Button>
         </div>
-      </div>
+      )}
+      {authError && (
+        <ErrorMsg>
+          Username or password is incorrect!
+        </ErrorMsg>
+      )}
     </div>
   )
 }
 
-export default Login;
+export {
+  Login,
+  Title,
+  Label,
+  Input,
+  Button,
+  ErrorMsg
+};

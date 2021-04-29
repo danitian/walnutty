@@ -3,8 +3,6 @@ const client = require('./database');
 const bcrypt = require('bcrypt');
 
 const initialize = (passport) => {
-  console.log('Initialized');
-
   passport.use(
     new LocalStrategy(authenticate)
   )
@@ -12,11 +10,11 @@ const initialize = (passport) => {
   passport.serializeUser((userMatch, callback) => callback(null, userMatch.user_id))
   passport.deserializeUser((userId, callback) => {
     const queryStr = `SELECT * FROM users WHERE user_id = $1`;
-    const params = [userId]; // need parseint?
+    const params = [userId];
 
     client.query(queryStr, params, (err, data) => {
       if (err) {
-        return callback(err); // better err handling
+        return callback(err);
       }
 
       return callback(null, data.rows[0])
@@ -30,16 +28,15 @@ const authenticate = (username, password, callback) => {
 
   client.query(queryStr, params, (err, data) => {
     if (err) {
-      return callback(err); // better err handling
+      return callback(err);
     }
-    console.log('data.rows: ', data.rows);
 
     if (data.rows.length > 0) {
       const userMatch = data.rows[0];
 
       bcrypt.compare(password, userMatch.password_hash, (err, isMatch) => {
         if (err) {
-          throw err; // better err handling
+          throw err;
         } else if (isMatch) {
           return callback(null, userMatch);
         } else {
